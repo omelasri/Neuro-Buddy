@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prépa Buddy 🧠 — Mohammed Amine</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --pink: #FF6B9D; --pink-light: #FFE0EE; --pink-dark: #C73B6F;
+    --mint: #4ECDC4; --mint-light: #D4F5F3; --mint-dark: #2A9B94;
+    --lav: #A78BFA; --lav-light: #EDE9FE; --lav-dark: #6D28D9;
+    --peach: #FFA07A; --peach-light: #FFE8DC;
+    --yellow: #FFD93D; --yellow-light: #FFF8D6;
+    --bg: #FFF9FB; --card: #FFFFFF; --text: #2D1B33; --muted: #9B7BA8;
+    --shadow: 0 4px 20px rgba(167,139,250,0.15);
+  }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .app { max-width: 480px; margin: 0 auto; padding: 0 0 80px; }
+
+  /* Welcome Splash */
+  .splash { position: fixed; inset: 0; background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 50%, #FF6B9D 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; transition: opacity 0.6s, transform 0.6s; padding: 32px; text-align: center; }
+  .splash.hide { opacity: 0; transform: scale(1.04); pointer-events: none; }
+  .splash-brain { font-size: 72px; display: block; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .splash-from { font-size: 12px; font-weight: 900; color: rgba(255,255,255,0.7); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+  .splash h1 { font-size: 36px; font-weight: 900; color: white; letter-spacing: -1px; margin-bottom: 6px; }
+  .splash-sub { font-size: 15px; color: rgba(255,255,255,0.85); font-weight: 700; line-height: 1.6; margin-bottom: 32px; }
+  .splash-name { font-size: 22px; font-weight: 900; color: white; margin-bottom: 4px; }
+  .splash-tagline { font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 600; margin-bottom: 36px; }
+  .splash-btn { padding: 16px 40px; background: white; border: none; border-radius: 18px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900; color: #7C3AED; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+  .splash-btn:hover { transform: scale(1.04); }
+  .splash-btn:active { transform: scale(0.97); }
+  .splash-credit { position: absolute; bottom: 24px; font-size: 12px; color: rgba(255,255,255,0.55); font-weight: 700; }
+  .splash-credit span { color: rgba(255,255,255,0.85); }
+
+  /* Footer signature */
+  .footer-sig { text-align: center; padding: 12px 0 4px; font-size: 12px; color: var(--muted); font-weight: 700; }
+  .footer-sig span { color: var(--pink); }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 50%, #FF6B9D 100%); padding: 28px 20px 26px; text-align: center; border-radius: 0 0 32px 32px; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+  .header::after { content: ''; position: absolute; bottom: -20px; left: -20px; width: 80px; height: 80px; background: rgba(255,255,255,0.06); border-radius: 50%; }
+  .header-name { font-size: 13px; font-weight: 800; color: rgba(255,255,255,0.8); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+  .header h1 { font-size: 30px; font-weight: 900; color: white; letter-spacing: -1px; }
+  .header-tagline { color: rgba(255,255,255,0.85); font-size: 13px; margin-top: 5px; font-weight: 600; }
+  .header-brain { font-size: 38px; display: block; margin-bottom: 8px; }
+
+  /* Nav pills */
+  .nav { display: flex; gap: 6px; padding: 14px 14px 0; overflow-x: auto; scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-btn { flex-shrink: 0; padding: 7px 14px; border-radius: 20px; border: 2px solid var(--lav-light); background: white; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+  .nav-btn.active { background: var(--lav); border-color: var(--lav); color: white; }
+
+  /* Sections */
+  .section { display: none; padding: 14px; }
+  .section.active { display: block; }
+
+  /* Cards */
+  .card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 12px; box-shadow: var(--shadow); }
+  .card-title { font-size: 12px; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+
+  /* Timer */
+  .mode-btns { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+  .mode-btn { padding: 6px 16px; border-radius: 12px; border: 2px solid var(--lav-light); background: white; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+  .mode-btn.active { background: var(--lav-light); border-color: var(--lav); color: var(--lav); }
+  .timer-ring { width: 170px; height: 170px; margin: 0 auto 18px; position: relative; }
+  .timer-svg { transform: rotate(-90deg); }
+  .timer-track { fill: none; stroke: var(--lav-light); stroke-width: 9; }
+  .timer-progress { fill: none; stroke: url(#grad); stroke-width: 9; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+  .timer-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+  .timer-time { font-size: 36px; font-weight: 900; color: var(--text); letter-spacing: -2px; }
+  .timer-label { font-size: 11px; color: var(--muted); font-weight: 800; margin-top: 2px; }
+  .timer-btns { display: flex; gap: 10px; justify-content: center; margin-bottom: 16px; }
+  .btn { padding: 12px 26px; border-radius: 14px; border: none; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+  .btn:active { transform: scale(0.96); }
+  .btn-primary { background: var(--lav); color: white; }
+  .btn-sm { padding: 10px 18px; font-size: 13px; }
+  .btn-danger { background: var(--pink-light); color: var(--pink-dark); }
+  .session-dots { display: flex; gap: 7px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+  .dot { width: 13px; height: 13px; border-radius: 50%; background: var(--lav-light); transition: all 0.4s; }
+  .dot.done { background: var(--lav); transform: scale(1.1); }
+  .tip-card { background: linear-gradient(135deg, var(--lav-light), var(--pink-light)); border-radius: 16px; padding: 14px 18px; text-align: center; font-size: 14px; font-weight: 700; color: var(--lav-dark); margin-top: 4px; }
+
+  /* Countdown */
+  .countdown-hero { text-align: center; padding: 18px 0 10px; }
+  .countdown-days { font-size: 72px; font-weight: 900; line-height: 1; background: linear-gradient(135deg, var(--lav), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .countdown-label { font-size: 14px; color: var(--muted); font-weight: 700; margin-top: 6px; }
+  .progress-bar { background: var(--lav-light); border-radius: 10px; height: 14px; margin: 16px 0 8px; overflow: hidden; }
+  .progress-fill { background: linear-gradient(90deg, var(--lav), var(--pink)); height: 100%; border-radius: 10px; transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+  .date-row { display: flex; gap: 10px; margin-top: 16px; }
+  .date-group { flex: 1; }
+  .date-group label { display: block; font-size: 11px; font-weight: 800; color: var(--muted); margin-bottom: 5px; }
+  .date-group input { width: 100%; padding: 10px 12px; border: 2px solid var(--lav-light); border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); outline: none; background: white; }
+  .date-group input:focus { border-color: var(--lav); }
+  .neuro-msg { background: linear-gradient(135deg, #F0EEFF, #FFE0EE); border-radius: 16px; padding: 18px; text-align: center; margin-top: 0; }
+  .neuro-msg .emoji { font-size: 28px; margin-bottom: 8px; display: block; }
+  .neuro-msg p { font-size: 14px; font-weight: 700; color: var(--lav-dark); line-height: 1.5; }
+
+  /* Rewards */
+  .points-hero { display: flex; align-items: center; gap: 18px; padding: 10px 0 14px; }
+  .points-big { font-size: 52px; font-weight: 900; background: linear-gradient(135deg, var(--lav), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
+  .points-info { font-size: 12px; color: var(--muted); font-weight: 700; line-height: 1.8; }
+  .badges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .badge-item { text-align: center; cursor: default; }
+  .badge-icon { font-size: 30px; margin-bottom: 4px; filter: grayscale(1); opacity: 0.35; transition: all 0.4s; }
+  .badge-icon.unlocked { filter: none; opacity: 1; animation: popIn 0.4s; }
+  @keyframes popIn { 0%{transform:scale(0)} 70%{transform:scale(1.2)} 100%{transform:scale(1)} }
+  .badge-name { font-size: 9px; font-weight: 800; color: var(--muted); line-height: 1.3; }
+
+  /* Motivation */
+  .moti-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, #FFF0F7, #F0EEFF); border: 2.5px dashed var(--lav); border-radius: 18px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900; color: var(--lav); cursor: pointer; text-align: center; margin-bottom: 12px; transition: all 0.2s; }
+  .moti-btn:active { transform: scale(0.98); }
+  .moti-card { background: linear-gradient(135deg, #FFF0F7, #F0EEFF); border-radius: 18px; padding: 22px; text-align: center; display: none; margin-bottom: 12px; }
+  .moti-card.visible { display: block; animation: fadeUp 0.3s; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .moti-emoji { font-size: 36px; display: block; margin-bottom: 12px; }
+  .moti-text { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.65; }
+
+  /* Open when */
+  .ow-grid { display: flex; flex-direction: column; gap: 10px; }
+  .ow-card { border-radius: 16px; padding: 16px 18px; cursor: pointer; border: 2px solid; text-align: left; font-family: 'Nunito', sans-serif; transition: all 0.2s; width: 100%; }
+  .ow-card:active { transform: scale(0.98); }
+  .ow-title { font-size: 14px; font-weight: 900; }
+  .ow-sub { font-size: 11px; opacity: 0.75; margin-top: 3px; font-weight: 700; }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(45,27,51,0.65); z-index: 200; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  .modal-card { background: white; border-radius: 28px; padding: 32px 24px; max-width: 360px; width: 100%; text-align: center; animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes modalIn { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
+  .modal-emoji { font-size: 52px; margin-bottom: 14px; display: block; }
+  .modal-title { font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 12px; }
+  .modal-text { font-size: 15px; color: var(--muted); line-height: 1.75; font-weight: 600; }
+  .modal-close { margin-top: 24px; width: 100%; }
+
+  /* Dashboard */
+  .streak-banner { background: linear-gradient(135deg, var(--yellow-light), var(--peach-light)); border-radius: 18px; padding: 18px; display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+  .streak-num { font-size: 44px; font-weight: 900; line-height: 1; }
+  .streak-label { font-size: 16px; font-weight: 900; color: var(--text); }
+  .streak-sub { font-size: 12px; color: var(--muted); font-weight: 700; margin-top: 3px; }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { background: white; border-radius: 16px; padding: 16px; box-shadow: var(--shadow); text-align: center; }
+  .stat-num { font-size: 34px; font-weight: 900; line-height: 1; }
+  .stat-label { font-size: 11px; font-weight: 800; color: var(--muted); margin-top: 4px; }
+  .neuro-quote { background: linear-gradient(135deg, #F0EEFF, #E8F4FD); border-radius: 16px; padding: 16px 18px; margin-top: 0; border-left: 4px solid var(--lav); }
+  .neuro-quote p { font-size: 13px; font-weight: 700; color: var(--lav-dark); line-height: 1.6; font-style: italic; }
+  .neuro-quote span { font-size: 11px; color: var(--muted); font-weight: 800; display: block; margin-top: 6px; }
+
+  /* Morning modal */
+  .morning-modal { display: none; position: fixed; inset: 0; background: linear-gradient(135deg, #7C3AED, #FF6B9D); z-index: 900; align-items: center; justify-content: center; padding: 28px; text-align: center; }
+  .morning-modal.open { display: flex; flex-direction: column; }
+  .morning-time { font-size: 13px; font-weight: 900; color: rgba(255,255,255,0.7); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+  .morning-emoji { font-size: 56px; margin-bottom: 16px; display: block; animation: float 3s ease-in-out infinite; }
+  .morning-title { font-size: 26px; font-weight: 900; color: white; margin-bottom: 12px; }
+  .morning-msg { font-size: 15px; color: rgba(255,255,255,0.9); font-weight: 700; line-height: 1.7; margin-bottom: 28px; max-width: 320px; }
+  .morning-quote { font-size: 13px; color: rgba(255,255,255,0.65); font-style: italic; font-weight: 600; margin-bottom: 32px; }
+  .morning-btn { padding: 16px 40px; background: white; border: none; border-radius: 18px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900; color: #7C3AED; cursor: pointer; transition: all 0.2s; }
+  .morning-btn:active { transform: scale(0.97); }
+
+  /* Mood tracker */
+  .mood-row { display: flex; gap: 8px; justify-content: center; margin: 8px 0; }
+  .mood-btn { font-size: 24px; background: none; border: 2.5px solid var(--lav-light); border-radius: 14px; padding: 8px 12px; cursor: pointer; transition: all 0.2s; }
+  .mood-btn.selected { border-color: var(--lav); background: var(--lav-light); transform: scale(1.1); }
+  .mood-label { font-size: 11px; font-weight: 800; color: var(--muted); text-align: center; margin-top: 4px; }
+
+  /* Sound player */
+  .sound-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sound-btn { background: white; border: 2px solid var(--lav-light); border-radius: 16px; padding: 16px 12px; cursor: pointer; text-align: center; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
+  .sound-btn.playing { border-color: var(--lav); background: var(--lav-light); }
+  .sound-btn:active { transform: scale(0.97); }
+  .sound-icon { font-size: 28px; display: block; margin-bottom: 6px; }
+  .sound-name { font-size: 12px; font-weight: 800; color: var(--text); }
+  .sound-sub { font-size: 10px; color: var(--muted); font-weight: 700; margin-top: 2px; }
+  .volume-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+  .volume-row label { font-size: 12px; font-weight: 800; color: var(--muted); white-space: nowrap; }
+  .volume-row input { flex: 1; }
+
+  /* Bottom nav */
+  .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 480px; max-width: 100%; background: white; border-top: 1px solid #F0E8F5; display: flex; padding: 8px 0 14px; box-shadow: 0 -4px 24px rgba(167,139,250,0.12); z-index: 100; }
+  .bnav-btn { flex: 1; background: none; border: none; cursor: pointer; padding: 6px 0; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .bnav-icon { font-size: 20px; }
+  .bnav-label { font-family: 'Nunito', sans-serif; font-size: 9px; font-weight: 800; color: var(--muted); }
+  .bnav-btn.active .bnav-label { color: var(--lav); }
+
+  /* Toast */
+  .toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--lav); color: white; padding: 13px 22px; border-radius: 16px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; z-index: 500; transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); white-space: nowrap; box-shadow: 0 8px 24px rgba(167,139,250,0.4); }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Confetti */
+  @keyframes fall { 0%{top:-10px;opacity:1;transform:rotate(0deg)} 100%{top:110vh;opacity:0;transform:rotate(720deg)} }
+  .cp { position: fixed; width: 9px; height: 9px; border-radius: 2px; animation: fall linear forwards; z-index: 400; pointer-events: none; }
+</style>
+</head>
+<body>
+<!-- Morning Modal -->
+<div class="morning-modal" id="morning-modal">
+  <div class="morning-time" id="morning-time">Bonjour ☀️</div>
+  <span class="morning-emoji" id="morning-emoji">🌅</span>
+  <div class="morning-title" id="morning-title">Bon courage Mohammed Amine !</div>
+  <div class="morning-msg" id="morning-msg">...</div>
+  <div class="morning-quote" id="morning-quote">...</div>
+  <button class="morning-btn" onclick="closeMorning()">C'est parti 🧠</button>
+</div>
+
+<!-- Welcome Splash -->
+<div class="splash" id="splash">
+  <span class="splash-brain">🧠</span>
+  <h1>Prépa Buddy</h1>
+  <div class="splash-sub">hope this makes your prépa<br>a little less stressful :)</div>
+  <div class="splash-name">Mohammed Amine</div>
+  <div class="splash-tagline">futur neurologue ✨</div>
+  <button class="splash-btn" onclick="enterApp()">C'est parti ! ▶</button>
+  <div class="splash-credit">made by <span>Omayma El Asri</span></div>
+</div>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <span class="header-brain">🧠</span>
+    <div class="header-name">Mohammed Amine</div>
+    <h1>Prépa Buddy</h1>
+    <div class="header-tagline">futur neurologue 🧠</div>
+  </div>
+
+  <!-- Timer Section -->
+  <div class="section active" id="sec-timer">
+    <div class="card">
+      <div class="mode-btns">
+        <button class="mode-btn active" onclick="setMode(25,5,this)">25/5</button>
+        <button class="mode-btn" onclick="setMode(50,10,this)">50/10</button>
+        <button class="mode-btn" onclick="setMode(15,5,this)">15/5</button>
+      </div>
+      <div class="timer-ring">
+        <svg class="timer-svg" width="170" height="170" viewBox="0 0 170 170">
+          <defs>
+            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#A78BFA"/>
+              <stop offset="100%" style="stop-color:#FF6B9D"/>
+            </linearGradient>
+          </defs>
+          <circle class="timer-track" cx="85" cy="85" r="74"/>
+          <circle class="timer-progress" id="timer-arc" cx="85" cy="85" r="74" stroke-dasharray="464.96" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-text">
+          <div class="timer-time" id="timer-display">25:00</div>
+          <div class="timer-label" id="phase-label">FOCUS 🧠</div>
+        </div>
+      </div>
+      <div class="timer-btns">
+        <button class="btn btn-primary" id="start-btn" onclick="toggleTimer()">▶ Start</button>
+        <button class="btn btn-danger" onclick="resetTimer()">↺ Reset</button>
+      </div>
+      <div class="card-title" style="text-align:center;">Sessions aujourd'hui</div>
+      <div class="session-dots" id="dots"></div>
+    </div>
+    <!-- Mood Tracker -->
+    <div class="card">
+      <div class="card-title">😊 Comment tu te sens ?</div>
+      <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:10px;">Avant de commencer ta session</div>
+      <div class="mood-row" id="mood-before">
+        <div><button class="mood-btn" onclick="selectMood('before','😴',this)">😴</button><div class="mood-label">Épuisé</div></div>
+        <div><button class="mood-btn" onclick="selectMood('before','😟',this)">😟</button><div class="mood-label">Stressé</div></div>
+        <div><button class="mood-btn" onclick="selectMood('before','😐',this)">😐</button><div class="mood-label">Neutre</div></div>
+        <div><button class="mood-btn" onclick="selectMood('before','😊',this)">😊</button><div class="mood-label">Motivé</div></div>
+        <div><button class="mood-btn" onclick="selectMood('before','🔥',this)">🔥</button><div class="mood-label">En feu</div></div>
+      </div>
+      <div id="mood-after-section" style="display:none; margin-top:12px; border-top:1px solid var(--lav-light); padding-top:12px;">
+        <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:10px;">Après ta session</div>
+        <div class="mood-row">
+          <div><button class="mood-btn" onclick="selectMood('after','😴',this)">😴</button><div class="mood-label">Épuisé</div></div>
+          <div><button class="mood-btn" onclick="selectMood('after','😤',this)">😤</button><div class="mood-label">Frustré</div></div>
+          <div><button class="mood-btn" onclick="selectMood('after','😌',this)">😌</button><div class="mood-label">Soulagé</div></div>
+          <div><button class="mood-btn" onclick="selectMood('after','😊',this)">😊</button><div class="mood-label">Bien</div></div>
+          <div><button class="mood-btn" onclick="selectMood('after','💪',this)">💪</button><div class="mood-label">Fier</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-card" id="tip-card">💧 Hydration check !</div>
+  </div>
+
+  <!-- Countdown Section -->
+  <div class="section" id="sec-countdown">
+    <div class="card">
+      <div class="card-title">⏳ Compte à rebours — Examen final</div>
+      <div class="countdown-hero">
+        <div class="countdown-days" id="days-num">—</div>
+        <div class="countdown-label" id="days-label">entre tes dates pour commencer</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800;color:var(--muted);">
+        <span>Début</span><span id="prog-pct">0% parcouru</span>
+      </div>
+      <div class="date-row">
+        <div class="date-group">
+          <label>📅 Début de prépa</label>
+          <input type="date" id="start-date" onchange="updateCountdown()">
+        </div>
+        <div class="date-group">
+          <label>🎯 Date de l'examen</label>
+          <input type="date" id="exam-date" onchange="updateCountdown()">
+        </div>
+      </div>
+    </div>
+    <div class="neuro-msg">
+      <span class="emoji">🧬</span>
+      <p id="cd-msg">La neurologie, c'est l'une des spécialités les plus complexes. Et tu as choisi de la maîtriser. Respect, Mohammed Amine.</p>
+    </div>
+  </div>
+
+  <!-- Rewards Section -->
+  <div class="section" id="sec-rewards">
+    <div class="card">
+      <div class="card-title">⚡ Synapse Points</div>
+      <div class="points-hero">
+        <div class="points-big" id="points-display">0</div>
+        <div class="points-info">+10 pts par session focus<br>+5 pts par pause prise<br>+20 pts par badge débloqué</div>
+      </div>
+      <div style="background:var(--lav-light);border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;color:var(--lav-dark);">
+        💡 Chaque synapse que tu utilises pour étudier devient plus forte. C'est de la vraie neuroplasticité !
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏅 Badges débloqués</div>
+      <div class="badges-grid" id="badges-grid"></div>
+    </div>
+  </div>
+
+  <!-- Motivation Section -->
+  <div class="section" id="sec-moti">
+    <button class="moti-btn" onclick="showMoti()">💌 Un message pour toi</button>
+    <div class="moti-card" id="moti-card">
+      <span class="moti-emoji" id="moti-emoji">💜</span>
+      <div class="moti-text" id="moti-text">...</div>
+    </div>
+    <div class="card">
+      <div class="card-title">🫠 Open when…</div>
+      <div class="ow-grid" id="ow-grid"></div>
+    </div>
+  </div>
+
+  <!-- Dashboard Section -->
+  <div class="section" id="sec-dash">
+    <div class="streak-banner">
+      <div class="streak-num" id="streak-num">🔥 0</div>
+      <div>
+        <div class="streak-label">Jours de streak</div>
+        <div class="streak-sub" id="streak-sub">Commence aujourd'hui !</div>
+      </div>
+    </div>
+    <div class="stats-grid" style="margin-bottom:12px;">
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--lav);" id="dash-sessions">0</div>
+        <div class="stat-label">Sessions aujourd'hui</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--pink);" id="dash-time">0m</div>
+        <div class="stat-label">Temps total de focus</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:#4ECDC4;" id="dash-points">0</div>
+        <div class="stat-label">Synapse points</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--peach);" id="dash-badges">0</div>
+        <div class="stat-label">Badges débloqués</div>
+      </div>
+    </div>
+    <div class="neuro-quote">
+      <p id="neuro-quote-text">"Le cerveau humain contient environ 86 milliards de neurones. Et toi, tu apprends à les soigner tous."</p>
+      <span>— Pour Mohammed Amine, neurologue 🧠</span>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <button class="bnav-btn active" onclick="showSection('timer',this)"><span class="bnav-icon">⏱️</span><span class="bnav-label">Focus</span></button>
+  <button class="bnav-btn" onclick="showSection('countdown',this)"><span class="bnav-icon">📅</span><span class="bnav-label">Examen final</span></button>
+  <button class="bnav-btn" onclick="showSection('rewards',this)"><span class="bnav-icon">⭐</span><span class="bnav-label">Rewards</span></button>
+  <button class="bnav-btn" onclick="showSection('moti',this)"><span class="bnav-icon">💌</span><span class="bnav-label">Moti</span></button>
+  <button class="bnav-btn" onclick="showSection('dash',this)"><span class="bnav-icon">📈</span><span class="bnav-label">Stats</span></button>
+</div>
+
+<!-- Open When Modal -->
+<div class="modal-overlay" id="ow-modal" onclick="closeOWOverlay(event)">
+  <div class="modal-card">
+    <span class="modal-emoji" id="ow-emoji">💜</span>
+    <div class="modal-title" id="ow-title">...</div>
+    <div class="modal-text" id="ow-text">...</div>
+    <button class="btn btn-primary modal-close" onclick="closeModal()">Fermer 🧠</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let S = JSON.parse(localStorage.getItem('nb_ma') || '{}');
+const defaults = { sessions:0, points:0, totalMins:0, unlocked:[], today:0, streak:0, lastDate:'' };
+Object.keys(defaults).forEach(k => { if (S[k] === undefined) S[k] = defaults[k]; });
+
+const todayStr = new Date().toDateString();
+const yStr = new Date(Date.now()-86400000).toDateString();
+if (S.lastDate !== todayStr) {
+  if (S.lastDate === yStr && S.today > 0) S.streak++;
+  else if (S.lastDate !== todayStr && S.today === 0) S.streak = 0;
+  S.today = 0;
+  S.lastDate = todayStr;
+  save();
+}
+function save() { localStorage.setItem('nb_ma', JSON.stringify(S)); }
+
+// ─── Timer ───────────────────────────────────────────────────────────────────
+let focusMins = 25, breakMins = 5;
+let totalSecs, currentSecs, isRunning = false, interval, isBreak = false;
+const CIRC = 2 * Math.PI * 74;
+
+function setMode(f, b, btn) {
+  focusMins = f; breakMins = b;
+  document.querySelectorAll('.mode-btn').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+  resetTimer();
+}
+
+function initTimer() {
+  totalSecs = focusMins * 60;
+  currentSecs = totalSecs;
+  updateTimerDisplay();
+  renderDots();
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(currentSecs/60), s = currentSecs%60;
+  document.getElementById('timer-display').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const pct = currentSecs / totalSecs;
+  document.getElementById('timer-arc').style.strokeDashoffset = CIRC * (1 - pct);
+  document.getElementById('phase-label').textContent = isBreak ? 'PAUSE 🌿' : 'FOCUS 🧠';
+}
+
+function toggleTimer() {
+  if (isRunning) {
+    clearInterval(interval); isRunning = false;
+    document.getElementById('start-btn').textContent = '▶ Continuer';
+  } else {
+    isRunning = true;
+    document.getElementById('start-btn').textContent = '⏸ Pause';
+    interval = setInterval(() => {
+      currentSecs--;
+      updateTimerDisplay();
+      if (currentSecs <= 0) {
+        clearInterval(interval); isRunning = false;
+        isBreak ? endBreak() : endSession();
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(interval); isRunning = false; isBreak = false;
+  totalSecs = focusMins*60; currentSecs = totalSecs;
+  document.getElementById('start-btn').textContent = '▶ Start';
+  updateTimerDisplay();
+}
+
+function endSession() {
+  S.sessions++; S.today++; S.points += 10; S.totalMins += focusMins;
+  checkBadges(); save(); updateAll();
+  confetti();
+  showToast(`+10 synapse points, Mohammed Amine ! 🧠✨`);
+  rotateTip();
+  showAfterMood();
+  isBreak = true; totalSecs = breakMins*60; currentSecs = totalSecs;
+  document.getElementById('start-btn').textContent = '▶ Pause';
+  updateTimerDisplay(); renderDots();
+}
+
+function endBreak() {
+  S.points += 5; save(); updateAll();
+  isBreak = false; totalSecs = focusMins*60; currentSecs = totalSecs;
+  document.getElementById('start-btn').textContent = '▶ Start';
+  updateTimerDisplay();
+  showToast('Pause terminée ! C\'est reparti 💪');
+}
+
+function renderDots() {
+  const el = document.getElementById('dots');
+  el.innerHTML = '';
+  for (let i = 0; i < 8; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < S.today ? ' done' : '');
+    el.appendChild(d);
+  }
+}
+
+// ─── Brain Tips ───────────────────────────────────────────────────────────────
+const tips = [
+  '💧 Hydration check !',
+  '🌿 Pause de 5 min autorisée, et méritée',
+  'Tes neurones ont besoin de repos aussi, Mohammed Amine 😭',
+  '🍎 T\'as mangé quelque chose ? Les neurones ont besoin de glucose !',
+  '🪟 Règle du 20-20-20 : regarde au loin 20 secondes',
+  '🧠 Chaque heure que tu étudies, tu te rapproches de tes patients',
+  '🫁 Cohérence cardiaque : inspire 5 sec, expire 5 sec',
+  '🧠 Le sommeil consolide la mémoire — dors bien ce soir !',
+  '📖 La neurologie t\'attend. Continue !',
+];
+let tipIdx = 0;
+function rotateTip() {
+  tipIdx = (tipIdx+1) % tips.length;
+  document.getElementById('tip-card').textContent = tips[tipIdx];
+}
+
+// ─── Countdown ────────────────────────────────────────────────────────────────
+const cdMsgs = [
+  'La neurologie, c\'est l\'une des spécialités les plus complexes. Et tu as choisi de la maîtriser.',
+  'Chaque jour qui passe, tu sais un peu plus que la veille. C\'est ça, devenir neurologue.',
+  'Les grands neurologues ont tous vécu ce que tu vis. Continue.',
+  'Tu n\'apprends pas juste pour l\'examen. Tu apprends pour tes futurs patients.',
+  'La ligne d\'arrivée se rapproche, Mohammed Amine. Tiens bon.',
+];
+
+function updateCountdown() {
+  const s = document.getElementById('start-date').value;
+  const e = document.getElementById('exam-date').value;
+  if (!e) return;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const exam = new Date(e);
+  const diff = Math.ceil((exam - now) / 86400000);
+  document.getElementById('days-num').textContent = Math.max(0, diff);
+  document.getElementById('days-label').textContent = diff > 0
+    ? (diff === 1 ? 'jour avant l\'examen final' : 'jours avant l\'examen final')
+    : '🏆 C\'est aujourd\'hui, Mohammed Amine !';
+
+  if (s) {
+    const start = new Date(s);
+    const total = Math.ceil((exam - start) / 86400000);
+    const done = Math.ceil((now - start) / 86400000);
+    const pct = Math.min(100, Math.max(0, Math.round(done/total*100)));
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-pct').textContent = pct + '% parcouru';
+    localStorage.setItem('nb_start', s);
+  }
+  localStorage.setItem('nb_exam', e);
+  document.getElementById('cd-msg').textContent = cdMsgs[Math.abs(diff||0) % cdMsgs.length];
+}
+
+// Restore dates
+if (localStorage.getItem('nb_exam')) {
+  document.getElementById('exam-date').value = localStorage.getItem('nb_exam');
+  if (localStorage.getItem('nb_start')) document.getElementById('start-date').value = localStorage.getItem('nb_start');
+  setTimeout(updateCountdown, 50);
+}
+
+// ─── Badges ───────────────────────────────────────────────────────────────────
+const BADGES = [
+  {id:'b1', icon:'🌱', name:'1ère session',    req: s => s.sessions >= 1},
+  {id:'b2', icon:'🔥', name:'5 sessions',      req: s => s.sessions >= 5},
+  {id:'b3', icon:'💎', name:'10 sessions',     req: s => s.sessions >= 10},
+  {id:'b4', icon:'🏆', name:'50 sessions',     req: s => s.sessions >= 50},
+  {id:'b5', icon:'⚡', name:'100 pts',         req: s => s.points >= 100},
+  {id:'b6', icon:'🌟', name:'500 pts',         req: s => s.points >= 500},
+  {id:'b7', icon:'⏰', name:'1h de focus',     req: s => s.totalMins >= 60},
+  {id:'b8', icon:'🧠', name:'Futur neuro',     req: s => s.totalMins >= 300},
+  {id:'b9', icon:'🎯', name:'Streak 3 jours',  req: s => s.streak >= 3},
+  {id:'b10',icon:'🌙', name:'Noctambule',      req: s => s.totalMins >= 120},
+  {id:'b11',icon:'💜', name:'Coup de cœur',    req: s => s.sessions >= 25},
+  {id:'b12',icon:'🎓', name:'Scholar',         req: s => s.totalMins >= 600},
+];
+
+function renderBadges() {
+  const el = document.getElementById('badges-grid');
+  el.innerHTML = '';
+  BADGES.forEach(b => {
+    const ok = S.unlocked.includes(b.id);
+    el.innerHTML += `<div class="badge-item" title="${b.name}"><div class="badge-icon ${ok?'unlocked':''}">${b.icon}</div><div class="badge-name">${b.name}</div></div>`;
+  });
+}
+
+function checkBadges() {
+  BADGES.forEach(b => {
+    if (!S.unlocked.includes(b.id) && b.req(S)) {
+      S.unlocked.push(b.id);
+      S.points += 20;
+      setTimeout(() => { showToast(`Badge débloqué : ${b.icon} ${b.name} ! +20 pts`); renderBadges(); }, 1800);
+    }
+  });
+}
+
+// ─── Motivation ───────────────────────────────────────────────────────────────
+const motis = [
+  {e:'💜', t:'Mohammed Amine, la neurologie c\'est l\'une des spécialités les plus difficiles à maîtriser. Le fait que tu l\'aies choisi dit tout sur qui tu es.'},
+  {e:'🧠', t:'Chaque réseau de neurones que tu étudies ce soir, tu le mémoriseras grâce à tes propres neurones. La science étudie la science. C\'est magnifique.'},
+  {e:'🔬', t:'Les meilleurs neurologues ont tous eu des moments de doute. Ce que tu ressens en ce moment, c\'est exactement ce que ressentaient tes futurs mentors à ta place.'},
+  {e:'🌙', t:'Ce soir tu études. Un jour, un patient te regardera et dira "c\'est lui qui m\'a aidé à retrouver ma vie." Travaille pour ce moment-là.'},
+  {e:'⚡', t:'La neuroplasticité, c\'est réel. Ton cerveau change physiquement à chaque heure que tu passes à étudier. Tu es en train de te transformer.'},
+  {e:'🏆', t:'Imagine la cérémonie. Ton nom. Ta spécialité : Neurologie. Ce n\'est pas un rêve, c\'est un plan. Continue à l\'exécuter.'},
+  {e:'🌱', t:'La régularité bat le talent. Et toi, Mohammed Amine, tu montres les deux. Ne t\'arrête pas maintenant.'},
+  {e:'🫂', t:'Quelqu\'un pense à toi en ce moment et est fier de ce que tu fais. On voit les efforts, même quand tu penses que personne ne regarde.'},
+];
+let motiIdx = 0;
+function showMoti() {
+  const m = motis[motiIdx++ % motis.length];
+  document.getElementById('moti-emoji').textContent = m.e;
+  document.getElementById('moti-text').textContent = m.t;
+  document.getElementById('moti-card').classList.add('visible');
+}
+
+// ─── Open When ────────────────────────────────────────────────────────────────
+const owCards = [
+  {bg:'#FFF0F7', bc:'#FF6B9D', label:'😰 Open when stressed', e:'🌊',
+   title:'Quand tu stresses, Mohammed Amine…',
+   text:'Pose une main sur ta poitrine. Ferme les yeux. Ce stress, c\'est ton cerveau qui protège quelque chose d\'important pour toi. Respire lentement. Rappelle-toi : tu as déjà traversé des choses difficiles. Tu peux gérer ça. Un concept à la fois. Une page à la fois. Tu n\'as pas à tout savoir ce soir.'},
+  {bg:'#FFFBF0', bc:'#FFD93D', label:'😴 Open when tired', e:'🌙',
+   title:'Quand tu es épuisé…',
+   text:'Écoute ton cerveau. La consolidation mémorielle se passe pendant le sommeil — dors 20 minutes ou arrête pour ce soir. Demain tu retiendras en 2h ce que tu oublierais en 6h de fatigue. Les grands neurologues connaissent leurs limites. Reconnaître la tienne, c\'est de la sagesse, pas de la faiblesse.'},
+  {bg:'#F0EEFF', bc:'#A78BFA', label:'💔 Open when you want to give up', e:'💜',
+   title:'Avant d\'arrêter…',
+   text:'Bois de l\'eau. Sors 10 minutes. Appelle quelqu\'un. Puis reviens lire ceci : tu n\'as pas choisi la neurologie par hasard. Quelque chose en toi sait que tu peux y arriver. Ce moment difficile n\'est pas une preuve que tu ne peux pas. C\'est une preuve que tu essaies vraiment. Et ça compte énormément.'},
+  {bg:'#E8FFF5', bc:'#4ECDC4', label:'😤 Open when you need a push', e:'🚀',
+   title:'Allez, Mohammed Amine !',
+   text:'OK. C\'est l\'heure. Téléphone en mode avion. Un verre d\'eau. Chrono sur 25 minutes. Tu n\'as pas besoin de motivation — tu as besoin de commencer. La motivation vient après l\'action, pas avant. Lance le timer. NOW.'},
+  {bg:'#FFF8E8', bc:'#FFA07A', label:'🎉 Open after exams', e:'🏆',
+   title:'TU L\'AS FAIT, MOHAMED AMINE !',
+   text:'Peu importe le résultat sur le papier — tu as traversé quelque chose d\'extraordinaire. Tu t\'es levé chaque jour pour ça. Tu as choisi la neurologie parce que tu crois en quelque chose de grand. On est fiers de toi. Maintenant : fête ça, dors, mange bien. Le reste viendra. 🎊🧠💜'},
+];
+
+function renderOW() {
+  const el = document.getElementById('ow-grid');
+  owCards.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ow-card';
+    btn.style.background = c.bg;
+    btn.style.borderColor = c.bc;
+    btn.innerHTML = `<div class="ow-title" style="color:#2D1B33">${c.label}</div><div class="ow-sub" style="color:#9B7BA8">Appuyer pour ouvrir →</div>`;
+    btn.onclick = () => openOW(i);
+    el.appendChild(btn);
+  });
+}
+
+function openOW(i) {
+  const c = owCards[i];
+  document.getElementById('ow-emoji').textContent = c.e;
+  document.getElementById('ow-title').textContent = c.title;
+  document.getElementById('ow-text').textContent = c.text;
+  document.getElementById('ow-modal').classList.add('open');
+}
+function closeModal() { document.getElementById('ow-modal').classList.remove('open'); }
+function closeOWOverlay(e) { if (e.target.id === 'ow-modal') closeModal(); }
+
+// ─── Quotes ───────────────────────────────────────────────────────────────────
+const quotes = [
+  '"Le cerveau humain contient environ 86 milliards de neurones. Et toi, tu apprends à les soigner tous."',
+  '"La neurologie explore ce qui nous rend humains. Tu as choisi la spécialité la plus profonde qui soit."',
+  '"Chaque synapse que tu utilises pour étudier devient plus forte. Tu es ta propre expérience de neuroplasticité."',
+  '"Un neurologue quelque part dans le monde est en train de passer son examen final. C\'est toi."',
+];
+
+// ─── Updates ──────────────────────────────────────────────────────────────────
+function updateAll() {
+  document.getElementById('points-display').textContent = S.points;
+  document.getElementById('dash-sessions').textContent = S.today;
+  document.getElementById('dash-points').textContent = S.points;
+  document.getElementById('dash-badges').textContent = S.unlocked.length;
+  const h = Math.floor(S.totalMins/60), m = S.totalMins%60;
+  document.getElementById('dash-time').textContent = h > 0 ? `${h}h${m>0?m+'m':''}` : `${m}m`;
+  document.getElementById('streak-num').textContent = `🔥 ${S.streak}`;
+  document.getElementById('streak-sub').textContent = S.streak >= 3 ? `Incroyable, ${S.streak} jours d'affilée !` : S.streak === 0 ? 'Commence aujourd\'hui !' : `Continue, plus que ${3-S.streak} jours pour le badge !`;
+  document.getElementById('neuro-quote-text').textContent = quotes[S.sessions % quotes.length];
+  renderDots();
+  renderBadges();
+}
+
+// ─── Nav ──────────────────────────────────────────────────────────────────────
+function showSection(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── Confetti ─────────────────────────────────────────────────────────────────
+function confetti() {
+  const cols = ['#A78BFA','#FF6B9D','#FFD93D','#4ECDC4','#FFA07A','#7C3AED'];
+  for (let i=0; i<35; i++) {
+    const p = document.createElement('div');
+    p.className = 'cp';
+    p.style.left = Math.random()*100+'vw';
+    p.style.background = cols[Math.floor(Math.random()*cols.length)];
+    p.style.animationDuration = (1.5+Math.random()*2)+'s';
+    p.style.animationDelay = Math.random()*0.6+'s';
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 3500);
+  }
+}
+
+// ─── Morning Message ──────────────────────────────────────────────────────────
+const morningData = [
+  {e:'🌅', title:'Nouvelle journée, nouveau départ !', msg:'Hier c\'est du passé. Ce qui compte c\'est ce que tu fais aujourd\'hui. Commence doucement, une session à la fois.', quote:'"Le secret pour avancer, c\'est de commencer." — Mark Twain'},
+  {e:'☀️', title:'Bonjour Mohammed Amine !', msg:'Ton cerveau s\'est reposé cette nuit et a consolidé tout ce que tu as appris hier. Tu es plus fort ce matin que tu ne l\'étais hier soir.', quote:'"Chaque expert a été un débutant." — Helen Hayes'},
+  {e:'🧠', title:'C\'est une belle journée pour apprendre !', msg:'Les neurologues savent que le cerveau est au maximum de ses capacités le matin. Profite de cette fenêtre dorée pour les sujets difficiles.', quote:'"Le succès, c\'est tomber sept fois et se relever huit."'},
+  {e:'🌸', title:'Tu es là, c\'est déjà tout !', msg:'Ouvrir cette app ce matin, c\'est déjà un choix. Beaucoup auraient snooze. Toi tu es là. Ça compte énormément.', quote:'"La motivation te lance, l\'habitude te maintient en marche."'},
+  {e:'⚡', title:'Let\'s go Mohammed Amine !', msg:'Une session de 25 minutes bien concentrée vaut mieux que 3h de révision dispersée. Focus, tu vas cartonner aujourd\'hui.', quote:'"Ce n\'est pas la montagne qui nous épuise, c\'est le grain de sable dans la chaussure."'},
+  {e:'🌙', title:'Bonne nuit réparatrice !', msg:'Tu te lèves pour travailler. Des millions de gens dorment encore. Tu construis ton futur pendant qu\'ils rêvent. Continue.', quote:'"Dors bien, mange bien, travaille bien. Dans cet ordre."'},
+  {e:'🎯', title:'Reste focus aujourd\'hui !', msg:'Pas besoin de tout réviser. Choisis 2-3 objectifs clairs pour aujourd\'hui et concentre-toi dessus. La clarté bat la quantité.', quote:'"Un objectif sans plan n\'est qu\'un souhait."'},
+];
+
+const neuroquotes = [
+  '"Le cerveau qui apprend est un cerveau qui change physiquement." — Neuroplasticité',
+  '"Chaque répétition renforce la myéline autour de tes neurones. Tu deviens littéralement plus fort."',
+  '"La mémoire à long terme se forme pendant le sommeil. Dors bien ce soir."',
+  '"Le stress aigu améliore la concentration. Utilise-le à ton avantage."',
+  '"86 milliards de neurones. Autant de raisons de ne pas lâcher."',
+];
+
+function showMorning() {
+  const now = new Date();
+  const h = now.getHours();
+  const greetings = h < 12 ? 'Bonjour ☀️' : h < 18 ? 'Bon après-midi 🌤️' : 'Bonsoir 🌙';
+  const d = morningData[now.getDay() % morningData.length];
+  document.getElementById('morning-time').textContent = greetings;
+  document.getElementById('morning-emoji').textContent = d.e;
+  document.getElementById('morning-title').textContent = d.title;
+  document.getElementById('morning-msg').textContent = d.msg;
+  document.getElementById('morning-quote').textContent = d.quote;
+  document.getElementById('morning-modal').classList.add('open');
+}
+
+function closeMorning() {
+  document.getElementById('morning-modal').classList.remove('open');
+}
+
+// ─── Mood Tracker ─────────────────────────────────────────────────────────────
+function selectMood(type, mood, btn) {
+  const row = btn.closest('.mood-row');
+  row.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  S['mood_' + type] = mood;
+  save();
+  if (type === 'before') showToast('Mood noté ! Bonne session 🧠');
+}
+
+function showAfterMood() {
+  document.getElementById('mood-after-section').style.display = 'block';
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+function enterApp() {
+  const splash = document.getElementById('splash');
+  splash.classList.add('hide');
+  setTimeout(() => {
+    splash.style.display = 'none';
+    showMorning();
+  }, 700);
+}
+
+initTimer();
+renderOW();
+updateAll();
+</script>
+</body>
+</html>
